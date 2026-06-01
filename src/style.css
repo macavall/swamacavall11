@@ -294,3 +294,10 @@ code {
     border-right-color: var(--border);
   }
 }
+
+.api-demo { margin-top: 2rem; text-align: center; }
+.api-demo form { display: flex; gap: 0.5rem; justify-content: center; align-items: center; margin-bottom: 0.75rem; }
+.api-demo input { padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid #888; }
+.api-demo button { padding: 0.4rem 0.9rem; border-radius: 6px; cursor: pointer; }
+.api-demo pre { display: inline-block; text-align: left; background: rgba(0,0,0,0.25); color: #eee; padding: 0.75rem 1rem; border-radius: 8px; min-width: 280px; }
+

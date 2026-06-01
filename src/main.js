@@ -16,6 +16,16 @@ document.querySelector('#app').innerHTML = `
     <p>Edit <code>src/main.js</code> and save to test <code>HMR</code></p>
   </div>
   <button id="counter" type="button" class="counter"></button>
+
+  <section class="api-demo">
+    <h2>API response</h2>
+    <form id="api-form">
+      <label for="api-name">Name:</label>
+      <input id="api-name" type="text" value="world" autocomplete="off" />
+      <button id="api-call" type="submit">Call /api/hello</button>
+    </form>
+    <pre id="api-result">(no response yet)</pre>
+  </section>
 </section>
 
 <div class="ticks"></div>
@@ -58,3 +68,23 @@ document.querySelector('#app').innerHTML = `
 `
 
 setupCounter(document.querySelector('#counter'))
+
+const apiForm = document.querySelector('#api-form')
+const apiResult = document.querySelector('#api-result')
+const apiName = document.querySelector('#api-name')
+
+apiForm.addEventListener('submit', async (event) => {
+  event.preventDefault()
+  apiResult.textContent = 'Loading...'
+  try {
+    const name = encodeURIComponent(apiName.value || 'world')
+    const response = await fetch(`/api/hello?name=${name}`)
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`)
+    }
+    const data = await response.json()
+    apiResult.textContent = JSON.stringify(data, null, 2)
+  } catch (err) {
+    apiResult.textContent = `Error: ${err.message}`
+  }
+})
