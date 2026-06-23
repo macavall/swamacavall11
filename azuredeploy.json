@@ -1,0 +1,125 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "tempName": {
+            "type": "string",
+            "defaultValue": "swalab01"
+        },
+        "name": {
+            "type": "string",
+            "defaultValue": "[concat(parameters('tempName'), uniqueString(resourceGroup().id))]"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "West US 2",
+            "allowedValues": [
+                "West US 2",
+                "Central US",
+                "East US 2",
+                "West Europe",
+                "East Asia"
+            ],
+            "metadata": {
+                "description": "Region for the Azure Static Web App (managed functions supported regions)."
+            }
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Free",
+                "Standard"
+            ]
+        },
+        "skuCode": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Free",
+                "Standard"
+            ]
+        },
+        "appLocation": {
+            "type": "string",
+            "defaultValue": "/",
+            "metadata": {
+                "description": "Location of the application source code within the repo."
+            }
+        },
+        "apiLocation": {
+            "type": "string",
+            "defaultValue": "api",
+            "metadata": {
+                "description": "Location of the Azure Functions API code within the repo (managed functions)."
+            }
+        },
+        "outputLocation": {
+            "type": "string",
+            "defaultValue": "dist",
+            "metadata": {
+                "description": "Build output folder produced by the front-end build (Vite default is 'dist')."
+            }
+        },
+        "repositoryUrl": {
+            "type": "string",
+            "defaultValue": "https://github.com/macavall/swamacavall11",
+            "metadata": {
+                "description": "GitHub repository URL linked to the Static Web App for CI/CD and managed Functions."
+            }
+        },
+        "branch": {
+            "type": "string",
+            "defaultValue": "main",
+            "metadata": {
+                "description": "Repository branch to build/deploy from when repositoryUrl is supplied."
+            }
+        },
+        "repositoryToken": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional GitHub PAT used to configure repo CI/CD. Leave empty if not linking a repo."
+            }
+        },
+        "allowConfigFileUpdates": {
+            "type": "bool",
+            "defaultValue": true
+        },
+        "stagingEnvironmentPolicy": {
+            "type": "string",
+            "defaultValue": "Enabled",
+            "allowedValues": [
+                "Enabled",
+                "Disabled"
+            ]
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2022-03-01",
+            "name": "[parameters('name')]",
+            "type": "Microsoft.Web/staticSites",
+            "location": "[parameters('location')]",
+            "tags": {
+                "SecurityControl": "Ignore"
+            },
+            "sku": {
+                "Tier": "[parameters('sku')]",
+                "Name": "[parameters('skuCode')]"
+            },
+            "properties": "[if(empty(parameters('repositoryUrl')), createObject('stagingEnvironmentPolicy', parameters('stagingEnvironmentPolicy'), 'allowConfigFileUpdates', parameters('allowConfigFileUpdates'), 'provider', 'None', 'enterpriseGradeCdnStatus', 'Disabled'), createObject('repositoryUrl', parameters('repositoryUrl'), 'branch', parameters('branch'), 'repositoryToken', parameters('repositoryToken'), 'buildProperties', createObject('appLocation', parameters('appLocation'), 'apiLocation', parameters('apiLocation'), 'outputLocation', parameters('outputLocation')), 'stagingEnvironmentPolicy', parameters('stagingEnvironmentPolicy'), 'allowConfigFileUpdates', parameters('allowConfigFileUpdates'), 'provider', 'GitHub', 'enterpriseGradeCdnStatus', 'Disabled'))]"
+        }
+    ],
+    "outputs": {
+        "staticWebAppName": {
+            "type": "string",
+            "value": "[parameters('name')]"
+        },
+        "defaultHostname": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Web/staticSites', parameters('name')), '2022-03-01').defaultHostname]"
+        }
+    }
+}
